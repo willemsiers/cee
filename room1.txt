@@ -1,5 +1,5 @@
 option>	look>	You see a red door[go] and a painting[check].
-option>	check>	It's a painting of Peter.>	hidden
+option>	check>	It's a painting of Peter.>hidden
 option>	go>		You go through the door...
 option>	talk>	You can say [b.la] or [asdf]
 option>	bla>	BLLABLaBLaBlaBlaBlablabla, it echoed...

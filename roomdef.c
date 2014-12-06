@@ -11,6 +11,7 @@
 struct Option{
 	char* query;
 	char* response;
+	int hidden;
 	struct Option* next;
 };
 
@@ -50,11 +51,12 @@ void addAction(char* query, void (*fupo)(union ActionArg), union ActionArg defAr
 	room->actions = action;
 };
 
-void addOption(char* query, char* response){
+void addOption(char* query, char* response, int hidden){
 	struct Option* option = (struct Option*) malloc(sizeof(struct Option)); //new option
 	option->query = query;
 	option->response = response;
 	option->next = room->options;
+	option->hidden = hidden; //hidden != 0 means to hide it in `options` cmd
 	room->options = option;
 }
 

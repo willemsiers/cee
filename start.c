@@ -113,7 +113,7 @@ int load(){
 			printf("%d\t%s\t%s\t\t%s\t\t\t%s\n",read,buf_mode,buf_query,buf_arg3,buf_arg4);
 			
 			if(strcmp(buf_mode, OPTION) == 0){
-				addOption(buf_query, buf_arg3);
+				addOption(buf_query, buf_arg3, strcmp(buf_arg4, "hidden")); 
 			}else{
 
 				union ActionArg defArg;
@@ -135,6 +135,14 @@ int load(){
 					return 2;
 				}
 			}
+
+			//add some globally available actions or options here
+			union ActionArg dummy;
+			addAction("options", &print_options, dummy);
+			addOption("hello","welcome!", 0);
+			addOption("help", "type some shit",0);
+			addOption("bye","byebye!!",0);
+
 		}
 		printf("(DEB) Last read option attempt was %s \n", buf_line);		
 
@@ -159,17 +167,11 @@ int load(){
 			action = action->next;
 		}
 	}
-	
-	addOption("hello","welcome!");
-	addOption("help", "type some shit");
-	addOption("bye","byebye!!");
 
 	return 0;
 }
 
 int main(){
-	// printf("%p %p %p",&on_go,&on_use,&on_say);
-	// return 0;
 	if(!load()){
 		int exitStatus = start();
 		printf("exit status: %d\n", exitStatus);
