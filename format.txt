@@ -1,0 +1,5 @@
+#Standard format:
+command	>	function	>	default argument
+
+#shorthand for query-response actions. `function` is by default filled in with `respond`
+command	>	>	text to respond with 

@@ -1,10 +1,5 @@
-option>	look>	You see a red door[go] and a painting[check].
-option>	check>	It's a painting of Peter.>hidden
-option>	go>		You go through the door...
-option>	talk>	You can say [b.la] or [asdf]
-option>	bla>	BLLABLaBLaBlaBlaBlablabla, it echoed...
-option>	asdf>	jkl;
-option>	ECHO>	ECHO ECHo ECho...
-action>	go>		room2.txt
-action>	say>	dummy
-action>	use>	dummy
+look>respond>You see a red door[go] and a painting[check].
+check>respond>It's a painting of Peter.>hidden
+go>actions_go>room2.txt
+use>actions_use>dummy
+say>actions_say>dummy

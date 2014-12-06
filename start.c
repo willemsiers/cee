@@ -49,18 +49,15 @@ int start(){
 				arg.text = spl_actionArg;
 				(*fupo)(arg);
 			}
+		}else{
+			printf("Huh?");
 		}
-		
-		else{
-			printf("msg:\t%s\n", getMessage(query));
-		}	
 	}
 	return status;
 }
 
 int load(){
 	int BUF_SIZE = 100;
-	char* OPTION = "option";
 
 	//temp vars (function scope) for gettings pointers of rooms as `Action` defArg
 	struct Room* rooms[10];
@@ -81,27 +78,23 @@ int load(){
 		strcpy(roomNames[roomCnt] , buf_room_listing);
 		roomCnt++;
 
-		//init linkedlist `options`
-		room->options = (struct Option*) malloc(sizeof(struct Option));
-		room->options->next = NULL;
-
 		//init linkedlist `actions`
 		room->actions = (struct Action*) malloc(sizeof(struct Action));
 		room->actions->next = NULL;
 
 		//shared buffers for each line that's read (no malloc needed) TODO: Can move outside outer while loop.
-		char buf_mode[BUF_SIZE];
 		char buf_line[BUF_SIZE];
-	
+		char buf_func[BUF_SIZE];
+
 		while(fgets(buf_line, BUF_SIZE, file_room) != NULL){
 			remNewline(buf_line);
 
 			//first allocate memory to let string contents live outside scope
 			char* buf_query = (char*) malloc(BUF_SIZE);
-			char* buf_arg3 = (char*) malloc(BUF_SIZE);
-			char* buf_arg4 = (char*) malloc(BUF_SIZE);
+			char* buf_arg = (char*) malloc(BUF_SIZE);
+			char buf_hidden[BUF_SIZE];
 
-			int read = sscanf(buf_line, "%100[^>] > %100[^>] > %100[^>] > %100[^\n]\n", buf_mode, buf_query, buf_arg3, buf_arg4);
+			int read = sscanf(buf_line, "%100[^>] > %100[^>] > %100[^>] > %100[^\n]\n", buf_query, buf_func, buf_arg, buf_hidden);
 
 			if(read <3){
 				printf("Error parsing file *near* %s\n",buf_query);
@@ -110,41 +103,34 @@ int load(){
 				return 1;
 			}
 
-			printf("%d\t%s\t%s\t\t%s\t\t\t%s\n",read,buf_mode,buf_query,buf_arg3,buf_arg4);
+			printf("%d\t%s\t%s\t\t%s\n",read,buf_query,buf_func,buf_arg);
 			
-			if(strcmp(buf_mode, OPTION) == 0){
-				addOption(buf_query, buf_arg3, strcmp(buf_arg4, "hidden")); 
+			union ActionArg defArg;
+			defArg.text = buf_arg;
+
+			int hidden = strcmp(buf_hidden, "hidden");
+
+			if(strcmp(buf_func, "actions_go") == 0){
+				addAction(buf_query, &actions_go, defArg, hidden); //required arg
+			}else if(strcmp(buf_func, "actions_say") == 0){
+				addAction(buf_query, &actions_say, defArg, hidden); //arg4 is user input, now it's just a dummy value
+			}else if(strcmp(buf_func, "actions_use") == 0){
+				addAction(buf_query, &actions_use, defArg, hidden); //arg 4 is dummy
+			}else if(strcmp(buf_func, "respond") == 0){
+				addAction(buf_query, &respond, defArg, hidden); //arg 4 is dummy
 			}else{
-
-				union ActionArg defArg;
-				defArg.text = buf_arg3;
-
-				if(strcmp(buf_query, "go") == 0){
-					printf("go\n");
-					addAction(buf_query, &on_go, defArg); //required arg
-				}else if(strcmp(buf_query, "say") == 0){
-					printf("say\n");
-					addAction(buf_query, &on_say, defArg); //arg4 is user input, now it's just a dummy value
-				}else if(strcmp(buf_query, "use") == 0){
-					printf("use\n");
-					addAction(buf_query, &on_use, defArg); //arg 4 is dummy
-				}else{
-					fclose(file_room);
-					fclose(file_room_listing);
-					printf("Error: action not found: %s\n",buf_query);
-					return 2;
-				}
+				fclose(file_room);
+				fclose(file_room_listing);
+				printf("Error: action not found: %s\n",buf_func);
+				return 2;
 			}
 
-			//add some globally available actions or options here
-			union ActionArg dummy;
-			addAction("options", &print_options, dummy);
-			addOption("hello","welcome!", 0);
-			addOption("help", "type some shit",0);
-			addOption("bye","byebye!!",0);
-
 		}
-		printf("(DEB) Last read option attempt was %s \n", buf_line);		
+		//add some globally available actions here
+		union ActionArg dummy;
+		addAction("options", &print_actions, dummy, 0);
+
+		printf("(DEB) Last read action attempt was %s \n", buf_line);		
 
 		fclose(file_room);
 	}
@@ -155,7 +141,7 @@ int load(){
 	while(roomCnt --> 0){
 		struct Action* action = rooms[roomCnt]->actions;
 		while(action != NULL){
-			if(action->fupo == &on_go){
+			if(action->fupo == &actions_go){
 				int i = 0;
 				while(i<=12 && (strcmp(roomNames[i], action->defArg.text) != 0)){i++;};
 				if(i == 12){ //ouch!!!
@@ -167,7 +153,6 @@ int load(){
 			action = action->next;
 		}
 	}
-
 	return 0;
 }
 

@@ -1,25 +1,14 @@
 /*
  *	This file defines:
- *		structs for Option and Action
- *		add- function for Action and Option
- *		get for Action, get for Message(from Option)
+ *		structs Action and Room
+ *		add- function for Action
+ *		get for Action
 *
  *	NOTE: these functions assume a global `room` var to get and set properties on 
 */
 
-//OPTION DEFINITION
-struct Option{
-	char* query;
-	char* response;
-	int hidden;
-	struct Option* next;
-};
-
-struct Option* options;
-
 //ROOM DEFINITION
 struct Room{
-	struct Option* options;
 	struct Action* actions;
 	// No 'linkedlist' features. If Action needs a different room use pointer.
 };
@@ -36,29 +25,22 @@ struct Action
 {	char* query;
 	void (*fupo)(union ActionArg);
 	union ActionArg defArg;
+	int hidden;
 	struct Action* next;
 };
 
 struct Action* actions;
 
 
-void addAction(char* query, void (*fupo)(union ActionArg), union ActionArg defArg){
+void addAction(char* query, void (*fupo)(union ActionArg), union ActionArg defArg, int hidden){
 	struct Action* action = (struct Action*) malloc(sizeof(struct Action)); //new action
 	action->query = query;
 	action->fupo = fupo;
 	action->defArg = defArg;
+	action->hidden = hidden;
 	action->next = room->actions;
 	room->actions = action;
 };
-
-void addOption(char* query, char* response, int hidden){
-	struct Option* option = (struct Option*) malloc(sizeof(struct Option)); //new option
-	option->query = query;
-	option->response = response;
-	option->next = room->options;
-	option->hidden = hidden; //hidden != 0 means to hide it in `options` cmd
-	room->options = option;
-}
 
 struct Action* getAction(char* query){
 	struct Action* action = room->actions;
@@ -69,15 +51,4 @@ struct Action* getAction(char* query){
 		action = action->next;
 	}
 	return NULL;
-}
-
-char* getMessage(char* query){
-	struct Option* option = room->options;
-	while(option->next != NULL){ //when (*option).next is null it's the dummy (root) node
-		if(strcmp(option->query, query) == 0){
-			return option->response;
-		}
-		option = option->next;
-	}
-	return "Not Found!";
 }
