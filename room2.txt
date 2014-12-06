@@ -1,0 +1,4 @@
+option>look>You're in the blue room.
+option>examine>Yes, it's definitely blue.
+action>go>room1.txt
+action>use>dummy
