@@ -1,5 +1,9 @@
 #Standard format:
-command	>	function	>	default argument
+command	>	function	>default argument.
+#or
+command >	function	>default argument.>	hidden
+
+command, function and hidden may have leading tabs (NOT SPACES!)
 
 #shorthand for query-response actions. `function` is by default filled in with `respond`
 command	>	>	text to respond with 

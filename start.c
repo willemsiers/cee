@@ -94,9 +94,9 @@ int load(){
 			char* buf_arg = (char*) malloc(BUF_SIZE);
 			char buf_hidden[BUF_SIZE];
 
-			int read = sscanf(buf_line, "%100[^>] > %100[^>] > %100[^>] > %100[^\n]\n", buf_query, buf_func, buf_arg, buf_hidden);
+			int read = sscanf(buf_line, "%100[^>\t]\t>\t%100[^>\t]\t>\t%100[^>]>\t%100[^\n]\n", buf_query, buf_func, buf_arg, buf_hidden);
 
-			if(read <3){
+			if(read <2){
 				printf("Error parsing file *near* %s\n",buf_query);
 				fclose(file_room);
 				fclose(file_room_listing);
@@ -130,7 +130,7 @@ int load(){
 		union ActionArg dummy;
 		addAction("options", &print_actions, dummy, 0);
 
-		printf("(DEB) Last read action attempt was %s \n", buf_line);		
+		printf("(DEB) Last read line was %s \n", buf_line);		
 
 		fclose(file_room);
 	}
