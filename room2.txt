@@ -1,4 +1,0 @@
-look>respond>You're in the blue room.
-examine>respond>Yes, it's definitely blue.
-go>actions_go>room1.txt
-use>actions_use>dummy

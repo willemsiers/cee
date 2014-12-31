@@ -1,5 +1,0 @@
-look>respond>You see a red door[go] and a painting[check].
-check	>	respond>It's a painting of Peter.>	hidden
-go>	actions_go>room2.txt
-use>	actions_use>dummy
-say>	actions_say>dummy

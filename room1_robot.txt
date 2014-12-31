@@ -1,0 +1,6 @@
+on_enter>on_enter_robot>dummy
+look>respond>You are in a grey coloured chamber. In the middle lies %robot_name. There is a door [door] on the right and there is an iron gate [gate]. There is also a trapdoor [trapdoor], although it looks very heavy.
+door>action_go>room2_switches.txt
+gate>action_go>room3_microwave.txt
+trapdoor>action_go>room4_basement.txt
+say>action_say_robot>dummy

@@ -10,6 +10,7 @@
 //ROOM DEFINITION
 struct Room{
 	struct Action* actions;
+    int (*on_enter)();
 	// No 'linkedlist' features. If Action needs a different room use pointer.
 };
 
@@ -51,4 +52,8 @@ struct Action* getAction(char* query){
 		action = action->next;
 	}
 	return NULL;
+}
+
+void setOnEnter(int (*fupo)()){
+    room->on_enter = fupo;
 }

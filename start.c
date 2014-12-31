@@ -2,6 +2,9 @@
 *	Global state vars below \!/
 */							 
 struct Room* room; //AKA currentRoom
+int powerful = 1; //used in actions.c (action_microwave)
+int trapdoor = 0;
+int follow_state = 0;
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,7 +15,7 @@ struct Room* room; //AKA currentRoom
 #include "actions.c"
 
 int start(){
-	int BUF_SIZE = 100;
+	int BUF_SIZE = 300;
 	char* query = malloc(BUF_SIZE);
 	int status = 0;
 
@@ -57,7 +60,7 @@ int start(){
 }
 
 int load(){
-	int BUF_SIZE = 100;
+	int BUF_SIZE = 300;
 
 	//temp vars (function scope) for gettings pointers of rooms as `Action` defArg
 	struct Room* rooms[10];
@@ -78,6 +81,10 @@ int load(){
 		strcpy(roomNames[roomCnt] , buf_room_listing);
 		roomCnt++;
 
+        //init on_enter to NULL
+        setOnEnter(NULL);
+        //room->on_enter = (int (*)()) malloc(sizeof(int (*)())); OLD
+
 		//init linkedlist `actions`
 		room->actions = (struct Action*) malloc(sizeof(struct Action));
 		room->actions->next = NULL;
@@ -94,7 +101,7 @@ int load(){
 			char* buf_arg = (char*) malloc(BUF_SIZE);
 			char buf_hidden[BUF_SIZE];
 
-			int read = sscanf(buf_line, "%100[^>\t]\t>\t%100[^>\t]\t>\t%100[^>]>\t%100[^\n]\n", buf_query, buf_func, buf_arg, buf_hidden);
+			int read = sscanf(buf_line, "%100[^>\t]\t>\t%100[^>\t]\t>\t%300[^>]>\t%100[^\n]\n", buf_query, buf_func, buf_arg, buf_hidden);
 
 			if(read <2){
 				printf("Error parsing file *near* %s\n",buf_query);
@@ -103,21 +110,56 @@ int load(){
 				return 1;
 			}
 
-			printf("%d\t%s\t%s\t\t%s\n",read,buf_query,buf_func,buf_arg);
+			//printf("%d\t%s\t%s\t\t%s\n",read,buf_query,buf_func,buf_arg);
 			
 			union ActionArg defArg;
+            unescapeNewline(buf_arg);
 			defArg.text = buf_arg;
 
 			int hidden = strcmp(buf_hidden, "hidden");
+            
+            void (*fupo)(union ActionArg);
+            int (*fupo_enter)() = NULL;
 
-			if(strcmp(buf_func, "actions_go") == 0){
-				addAction(buf_query, &actions_go, defArg, hidden); //required arg
-			}else if(strcmp(buf_func, "actions_say") == 0){
-				addAction(buf_query, &actions_say, defArg, hidden); //arg4 is user input, now it's just a dummy value
-			}else if(strcmp(buf_func, "actions_use") == 0){
-				addAction(buf_query, &actions_use, defArg, hidden); //arg 4 is dummy
+            //comments are incorrect
+			if(strcmp(buf_func, "action_go") == 0){
+				fupo = &action_go;
+			}else if(strcmp(buf_func, "action_say") == 0){
+				fupo = &action_say;
+			}else if(strcmp(buf_func, "action_use") == 0){
+				fupo = &action_use;
+			}else if(strcmp(buf_func, "action_order_view") == 0){
+				fupo = &action_order_view;
+			}else if(strcmp(buf_func, "action_order_push") == 0){
+				fupo = &action_order_push;
+			}else if(strcmp(buf_func, "action_go_flee") == 0){
+				fupo = &action_go_flee;
+			}else if(strcmp(buf_func, "action_say_robot") == 0){
+				fupo = &action_say_robot;
+			}else if(strcmp(buf_func, "action_microwave") == 0){
+				fupo = &action_microwave;
+			}else if(strcmp(buf_func, "action_close_trapdoor") == 0){
+				fupo = &action_close_trapdoor;
+			}else if(strcmp(buf_func, "action_listen") == 0){
+				fupo = &action_listen;
+			}else if(strcmp(buf_func, "action_follow_left") == 0){
+				fupo = &action_follow_left;
+			}else if(strcmp(buf_func, "action_follow_right") == 0){
+				fupo = &action_follow_right;
+			}else if(strcmp(buf_func, "action_look_basement") == 0){
+				fupo = &action_look_basement;
+			}else if(strcmp(buf_func, "action_basement_button") == 0){
+				fupo = &action_basement_button;
+			}else if(strcmp(buf_func, "action_basement_check") == 0){
+				fupo = &action_basement_check;
+			}else if(strcmp(buf_func, "action_basement_type") == 0){
+				fupo = &action_basement_type;
+			}else if(strcmp(buf_func, "on_enter_basement") == 0){
+				fupo_enter = &on_enter_basement;
+			}else if(strcmp(buf_func, "on_enter_robot") == 0){
+				fupo_enter = &on_enter_robot;
 			}else if(strcmp(buf_func, "respond") == 0){
-				addAction(buf_query, &respond, defArg, hidden); //arg 4 is dummy
+				fupo = &respond;
 			}else{
 				fclose(file_room);
 				fclose(file_room_listing);
@@ -125,12 +167,19 @@ int load(){
 				return 2;
 			}
 
+            //on_enter callbacks
+            if(strcmp(buf_query, "on_enter") == 0){
+               setOnEnter(fupo_enter);
+            }else{
+                addAction(buf_query, fupo, defArg, hidden);
+            }
+
 		}
 		//add some globally available actions here
 		union ActionArg dummy;
 		addAction("options", &print_actions, dummy, 0);
 
-		printf("(DEB) Last read line was %s \n", buf_line);		
+		//printf("(DEB) Last read line was %s \n", buf_line);		
 
 		fclose(file_room);
 	}
@@ -141,7 +190,7 @@ int load(){
 	while(roomCnt --> 0){
 		struct Action* action = rooms[roomCnt]->actions;
 		while(action != NULL){
-			if(action->fupo == &actions_go){
+			if(action->fupo == &action_go){
 				int i = 0;
 				while(i<=12 && (strcmp(roomNames[i], action->defArg.text) != 0)){i++;};
 				if(i == 12){ //ouch!!!
@@ -153,6 +202,9 @@ int load(){
 			action = action->next;
 		}
 	}
+
+    int loadActionsStatus = loadActions();
+
 	return 0;
 }
 
