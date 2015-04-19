@@ -2,11 +2,17 @@
  *	Global state vars below \!/
  */							 
 struct Room* room; //AKA currentRoom
-int powerful = 1; //used in actions.c (action_microwave)
+int powerful = 0; //used in actions.c (action_microwave)
 int trapdoor = 0;
 int gate_locked = 1;
 int follow_state = 0;
 
+
+#ifdef Release
+    #define room_listing_path "data/rooms.dat"
+#else
+    #define room_listing_path "room_listing.txt"
+#endif
 
 #define ROBO_NAME "House Robot 3000"
 #define VOICE_CMD "housebot"
@@ -81,13 +87,22 @@ int load(){
     char roomNames[10][BUF_SIZE];
     int roomCnt = 0;
 
-    FILE* file_room_listing = fopen("room_listing.txt", "r");
+    FILE* file_room_listing = fopen(room_listing_path, "r");
 
     char* buf_room_listing = (char*) malloc(BUF_SIZE);
 
     while(fgets(buf_room_listing, BUF_SIZE, file_room_listing) != NULL){
         remNewline(buf_room_listing);
+#ifdef Release
+        replaceTxtWithDat(buf_room_listing);
+        char* corrected_path = (char*)malloc(BUF_SIZE);
+        strcpy(corrected_path, "data/");
+        strcat(corrected_path, buf_room_listing);
+        buf_room_listing = corrected_path;
+        FILE* file_room = fopen(corrected_path, "r");
+#else
         FILE* file_room = fopen(buf_room_listing, "r");
+#endif
 
         //create new `Room`
         room = (struct Room*) malloc(sizeof(struct Room)); //set global var
@@ -241,6 +256,7 @@ int main(){
             printf("Programming: Willem Siers\n");
         }
         printf("Thank you for playing.\n");
+        setTerminalColor(COL_DEFAULT);
     }else{
         printf("Error during loading. Status code: %d\n", loadStatus);
     }

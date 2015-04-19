@@ -1,0 +1,28 @@
+#!/bin/bash
+
+filename_base="start"
+filename_in="$filename_base.c"
+path_out="dist"
+filename_out="$path_out/start"
+
+rm -r $path_out
+mkdir $path_out
+mkdir $path_out/data
+
+for f in room*.txt; do
+    cp -- "$f" "dist/data/${f%.txt}.dat"
+done
+mv $path_out/data/room_listing.dat $path_out/data/rooms.dat
+
+echo -e "$(tput setaf 3)========START========="
+echo "input: $filename_in -> output: $filename_out"
+echo -e "======================\n$(tput sgr0)"
+if [ ! -d "bin" ]; then
+    mkdir bin
+    echo done
+fi
+gcc $filename_in -O3 -o $filename_out -g -Wall -Wextra -DRelease
+
+#if [[ $? -eq 0 ]]; then
+#    ./$filename_out
+#fi

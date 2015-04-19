@@ -5,6 +5,7 @@
 #define COL_INPUT 1
 #define COL_STORY 2
 #define COL_END 3
+#define COL_DEFAULT 4 //enviromens dependent
 
 #ifdef _WIN32
 void setTerminalColor(int colMode){
@@ -19,6 +20,9 @@ void setTerminalColor(int colMode){
     }
     else if(colMode == COL_END){
         wAttribute = FOREGROUND_YELLOW;
+    }
+    else if(colMode == COL_DEFAULT){
+        wAttribute = FOREGROUND_WHITE;
     }
 
     GetConsoleScreenBufferInfo(hConsole, &consoleInfo);
@@ -36,8 +40,23 @@ void setTerminalColor(int colMode){
     else if(colMode == COL_END){
         printf("\x1B[33m");
     }
+    else if(colMode == COL_DEFAULT){
+        printf("\e[1;37m");
+    }
 }
 #endif
+
+//Replace \n with \0
+void replaceTxtWithDat(char* str){
+	char* MAX = str + 300;
+	for(; *str != '.' && str != MAX; str++);
+    str++;
+    *str = 'd';
+    str++;
+    *str = 'a';
+    str++;
+    *str = 't';
+}
 
 //Replace \n with \0
 void remNewline(char* str){
