@@ -1,5 +1,4 @@
-look>respond>You are in a blue room and on the wall is some text [examine], it seems encrypted. There are also 6 buttons on the wall [push].@There is a door to the robot [return] and a door to the outside world [leave].
-examine>action_order_view>dummy
-push>action_order_push>. Try button 0 to 5.
-back>action_go>room1_robot.txt
-flee>action_go_flee>dummy
+look>respond>You are in a blue room and on the wall is some text [examine], it seems encrypted. There are also 6 buttons on the wall [push].@There is a door to the robot [return]
+examine>action_order_view>dummy>hidden
+push>action_order_push>Try button 0 to 5.>hidden
+return>action_go>room1_robot.txt

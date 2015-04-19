@@ -1,3 +1,5 @@
+#ifndef ROOMDEF_C
+#define ROOMDEF_C
 /*
  *	This file defines:
  *		structs Action and Room
@@ -14,17 +16,18 @@ struct Room{
 	// No 'linkedlist' features. If Action needs a different room use pointer.
 };
 
+typedef union ActionArg ActionArg;
 union ActionArg {
 	char* text;
 	struct Room* room;
 };
 
-typedef void (* FuncSig)(union ActionArg defArg); //type for returning a void function with a string argument  
+typedef int (* FuncSig)(union ActionArg defArg); //type for returning a void function with a string argument  
 
 //ACTION DEFINITION
 struct Action
 {	char* query;
-	void (*fupo)(union ActionArg);
+	int (*fupo)(union ActionArg);
 	union ActionArg defArg;
 	int hidden;
 	struct Action* next;
@@ -33,19 +36,31 @@ struct Action
 struct Action* actions;
 
 
-void addAction(char* query, void (*fupo)(union ActionArg), union ActionArg defArg, int hidden){
-	struct Action* action = (struct Action*) malloc(sizeof(struct Action)); //new action
-	action->query = query;
-	action->fupo = fupo;
-	action->defArg = defArg;
-	action->hidden = hidden;
-	action->next = room->actions;
-	room->actions = action;
+void addAction(char* query, int (*fupo)(union ActionArg), union ActionArg defArg, int hidden){
+    struct Action* action = (struct Action*) malloc(sizeof(struct Action)); //new action
+    action->query = query;
+    action->fupo = fupo;
+    action->defArg = defArg;
+    action->hidden = hidden;
+    action->next = NULL;
+
+    struct Action* actionsTail = room->actions;
+    //is first action of room?
+    if(actionsTail->fupo == NULL){
+        room->actions = action;
+    }else{
+        //add to end of list`
+        while(actionsTail ->next != NULL){
+            actionsTail  = actionsTail->next;
+        }
+        actionsTail->next = action;
+    }
+
 };
 
 struct Action* getAction(char* query){
 	struct Action* action = room->actions;
-	while(action->next != NULL){
+	while(action != NULL){
 		if(strcmp(action->query, query) == 0){
 			return action;
 		}
@@ -57,3 +72,5 @@ struct Action* getAction(char* query){
 void setOnEnter(int (*fupo)()){
     room->on_enter = fupo;
 }
+
+#endif

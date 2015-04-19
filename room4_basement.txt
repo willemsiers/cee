@@ -1,13 +1,14 @@
-on_enter>on_enter_basement>dummy
+on_enter>on_enter_basement>dummy>hidden
 look>action_look_basement>dummy
 trapdoor>action_close_trapdoor>dummy
-ladder>action_go>room1_robot.txt
+climb>action_go>room1_robot.txt
 listen>action_listen>dummy>hidden
 hear>action_listen>dummy>hidden
 audio>action_listen>dummy>hidden
 sound>action_listen>dummy>hidden
 left>action_follow_left>dummy>hidden
 right>action_follow_right>dummy>hidden
+return>action_follow_return>dummy
 push>action_basement_button>dummy>hidden
 type>action_basement_type>000000000>hidden
 examine>action_basement_check>dummy>hidden

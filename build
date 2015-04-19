@@ -1,0 +1,18 @@
+#!/bin/bash
+
+filename_base="start"
+filename_in="$filename_base.c"
+filename_out="bin/start"
+
+echo -e "$(tput setaf 3)========START========="
+echo "input: $filename_in -> output: $filename_out"
+echo -e "======================\n$(tput sgr0)"
+if [ ! -d "bin" ]; then
+    mkdir bin
+    echo done
+fi
+gcc $filename_in -o $filename_out -g -Wall -Wextra
+
+#if [[ $? -eq 0 ]]; then
+#    ./$filename_out
+#fi

@@ -1,4 +1,5 @@
-look>respond>There is a microwave[microwave] on a table, and a little paper with some pencil marks on it[paper]. There seem to be plenty cold hotdogs, I wonder how long they need to be microwaved...
-paper>respond> +-+-+-+ +-+ +-+-+@|1|0|0| |<| |9|9|@+-+-+-+ +-+ +-+-+@|1|1|1| |=| |?|?|@+-+-+-+ +-+ +-+-+>hidden
+on_enter>on_enter_microwave>dummy>hidden
+look>respond>There is a microwave[microwave] on a table, and a little paper with some pencil marks on it[read]. There seem to be plenty cold hotdogs, I wonder how long they need to be microwaved...
+read>respond> +-+-+-+ +-+ +-+-+@|1|0|0| |<| |9|9|@+-+-+-+ +-+ +-+-+@|1|1|1| |=| |?|?|@+-+-+-+ +-+ +-+-+>hidden
 microwave>action_microwave>0>hidden
-back>action_go>room1_robot.txt
+return>action_go>room1_robot.txt

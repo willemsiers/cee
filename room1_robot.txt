@@ -1,6 +1,8 @@
-on_enter>on_enter_robot>dummy
-look>respond>You are in a grey coloured chamber. In the middle lies %robot_name. There is a door [door] on the right and there is an iron gate [gate]. There is also a trapdoor [trapdoor], although it looks very heavy.
-door>action_go>room2_switches.txt
-gate>action_go>room3_microwave.txt
-trapdoor>action_go>room4_basement.txt
+on_enter>on_enter_robot>dummy>hidden
+look>respond>You are in a grey coloured chamber. In the middle lies a robot [examine].@Also, there is a door [door] on the right and there is an iron gate [gate]. There is also a trapdoor [trapdoor], although it looks very heavy.
+door>action_go>room2_switches.txt>hidden
+gate>action_go>room3_microwave.txt>hidden
+trapdoor>action_go>room4_basement.txt>hidden
 say>action_say_robot>dummy
+examine>respond>It's an android robot. It seems to be connected, through the floor, with the rest of the room. It doesn't look like it's moving, although it does feel like there's something going on inside that outer shell...@A manual lies next to it [manual]. It looks torn, and incomplete. As if an attempt has been made to destroy it.>hidden
+manual>respond>You read the manual:@@House Robot 3000 user manual@@Specifications:@-Voice instructed (activated by "housebot")@-Instruction buffer size: 1@-Very smart@@Usage: say "housebot" followed by an instruction to let housebot execute this instruction. The instruction is always in CAPTITAL LETTERS, and therefore must be shouted. A list of available instrucions will follow now:"@@Manual@Page 1@BREW  @Coffee@over@HTTP@@Manual@Page 2@COOK@Makes@dinner@@@The rest of the manual is missing...>hidden
