@@ -10,8 +10,12 @@ int follow_state = 0;
 
 #ifdef Release
     #define room_listing_path "data/rooms.dat"
+    #define ROOM_FILE_EXTENSIONS  ".dat"
+    #define ROOM_FILE_ROOT "data/"
 #else
     #define room_listing_path "room_listing.txt"
+    #define ROOM_FILE_EXTENSIONS ".txt"
+    #define ROOM_FILE_ROOT ""
 #endif
 
 #define ROBO_NAME "House Robot 3000"
@@ -83,7 +87,7 @@ int start(){
 
 int load(){
     //temp vars (function scope) for gettings pointers of rooms as `Action` defArg
-    struct Room* rooms[10];
+    struct Room* rooms[4];
     char roomNames[10][BUF_SIZE];
     int roomCnt = 0;
 
@@ -99,10 +103,8 @@ int load(){
         strcpy(corrected_path, "data/");
         strcat(corrected_path, buf_room_listing);
         buf_room_listing = corrected_path;
-        FILE* file_room = fopen(corrected_path, "r");
-#else
-        FILE* file_room = fopen(buf_room_listing, "r");
 #endif
+        FILE* file_room = fopen(buf_room_listing, "r");
 
         //create new `Room`
         room = (struct Room*) malloc(sizeof(struct Room)); //set global var
@@ -140,17 +142,8 @@ int load(){
                 return 1;
             }
 
-            //printf("%d\t%s\t%s\t\t%s\n",read,buf_query,buf_func,buf_arg);
-
-            union ActionArg defArg = {};
-            unescapeNewline(buf_arg);
-            defArg.text = buf_arg;
-
-            int hidden = strcmp(buf_hidden, "hidden");
-
             int (*fupo)(union ActionArg) = NULL;
             int (*fupo_enter)() = NULL;
-
             //comments are incorrect
             if(strcmp(buf_func, "action_go") == 0){
                 fupo = &action_go;
@@ -197,6 +190,19 @@ int load(){
                 return 2;
             }
 
+            union ActionArg defArg = {};
+            unescapeNewline(buf_arg);
+            if(fupo != &action_go){
+                defArg.text = buf_arg;
+            }else{
+                defArg.text = (char*)malloc(80);
+                strcpy(defArg.text, ROOM_FILE_ROOT);
+                strcat(defArg.text, buf_arg);
+                strcat(defArg.text, ROOM_FILE_EXTENSIONS);
+            }
+
+            int hidden = strcmp(buf_hidden, "hidden");
+
             //on_enter callbacks
             if(strcmp(buf_query, "on_enter") == 0){
                 setOnEnter(fupo_enter);
@@ -222,8 +228,8 @@ int load(){
         while(action != NULL){
             if(action->fupo == &action_go){
                 int i = 0;
-                while(i<=12 && (strcmp(roomNames[i], action->defArg.text) != 0)){i++;};
-                if(i == 12){ //ouch!!!
+                while(i<=6 && (strcmp(roomNames[i], action->defArg.text) != 0)){i++;};
+                if(i == 6){ //ouch!!!
                     printf("ERROR! room not found!\n"); 
                 }
                 //printf("Replacing defArg %s to %p\n", action->defArg.text, rooms[i]);

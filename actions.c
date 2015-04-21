@@ -182,7 +182,7 @@ int action_say_robot(union ActionArg text){
                     }
                 }
                 else{
-                    printf("\"yes?\" (please say a command)\n");
+                    printf("\"yes?\" (please add a command)\n");
                 }
             }else{
                 printf("*quiet*\n");
