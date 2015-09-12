@@ -147,39 +147,36 @@ int action_say_robot(union ActionArg text){
                 if(cmd != NULL){
                     if(strcmp(cmd, "HCF") == 0){
                         printf("Hahaha, do you think I am that stupid?\n");
-                    }
-                    else if(strcmp(cmd, "BREW") == 0){
+                    } else if(strcmp(cmd, "BREW") == 0){
                         printf("Sending BREW POST...\n");
                         printf("Received error response:...\n");
                         printf("Status 418: I'm a teapot\n");
                         printf("\"Sorry, I tried\"\n");
-                    }
-                    else if(strcmp(cmd, "COOK") == 0){
+                    } else if(strcmp(cmd, "COOK") == 0){
                         printf("\"The microwave is in the kitchen\" (behind the gate)\n");
-                    }
-                    else if(strcmp(cmd, "UNLOCK") == 0){
+                    } else if(strcmp(cmd, "UNLOCK") == 0){
                         if(gate_locked){
                             printf("The gate unlocks with a soft click...\n");
                             gate_locked = 0;
                         }
                         printf("You can now go through the gate! [gate]\n");
-                    }
-                    else if(strcmp(cmd, "open") == 0){
+                    } else if (strcmp(cmd, "open") == 0){
                         printf("I won't open the door :( \n");
-                    }
-                    else{
+                    } else {
                         printf("%s: command not found *Brrrrrt*\n", cmd);
-                        //check for roberflow
-                        cmd = strtok(NULL, " ");
-                        if(cmd != NULL){
-                            if(strcmp(cmd, "HCF") == 0){
-                                printf("The robot blows up and you die.\n");
-                                return EXIT_WIN;
-                            }else{
-                                printf("*̡ͣ͆̇͑̊ͧ̒b́ͨ̅̎͜͡lͥ̅̆̏ͦ̎͠eͦ͢e̾̈́̀͞͏p̄̒͗̔ͬ̓ ̶ͨ̍ͥ̂ͪ̄̀b̢̢̿ͤ̚͞l̄͏̷ōͨ͛̾͆ͫ͊ͯ͜ȯ̈́͑͛͘pͮ̾ͮͧ̽̈ͤ̍͠ ̸̨ͦ̊͑̂͋ͩ̐̏̎̕K̷̢̈ͮ̃̔ͣͦ͟ķ̓̅ͧͭ̕g̸ͬ̾͒ͥ͛̂ͦ͗ͣǵͬ̌̀̿ͤͯ͜t̨̆̏̓ͧͪ́̆ͩ̏͞t̸̔̑̊̈ͯ̅ͭͧͨ̕tͮ̿̎ͯ̋̈ͯ͏̡*̔͛҉̧\n");
-                            }
-                        }
-                    }
+					}
+					
+					//check for roberflow
+					cmd = strtok(NULL, " ");
+					if(cmd != NULL){
+						if(strcmp(cmd, "HCF") == 0){
+							printf("The robot blows up and you die.\n");
+							return EXIT_WIN;
+						}else{
+							printf("*̡ͣ͆̇͑̊ͧ̒b́ͨ̅̎͜͡lͥ̅̆̏ͦ̎͠eͦ͢e̾̈́̀͞͏p̄̒͗̔ͬ̓ ̶ͨ̍ͥ̂ͪ̄̀b̢̢̿ͤ̚͞l̄͏̷ōͨ͛̾͆ͫ͊ͯ͜ȯ̈́͑͛͘pͮ̾ͮͧ̽̈ͤ̍͠ ̸̨ͦ̊͑̂͋ͩ̐̏̎̕K̷̢̈ͮ̃̔ͣͦ͟ķ̓̅ͧͭ̕g̸ͬ̾͒ͥ͛̂ͦ͗ͣǵͬ̌̀̿ͤͯ͜t̨̆̏̓ͧͪ́̆ͩ̏͞t̸̔̑̊̈ͯ̅ͭͧͨ̕tͮ̿̎ͯ̋̈ͯ͏̡*̔͛҉̧\n");
+						}
+					}
+
                 }
                 else{
                     printf("\"yes?\" (please add a command)\n");
@@ -189,7 +186,6 @@ int action_say_robot(union ActionArg text){
             }
         }
 
-        //free(cmd);
         free(input);
     }
     return 0;
