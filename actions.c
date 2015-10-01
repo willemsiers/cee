@@ -1,6 +1,8 @@
 #ifndef ACTIONS_C
 #define ACTIONS_C
 #include "roomdef.c"
+/** for isdigit **/
+#include <ctype.h>
 
 /* *	Actions that can be called from the script */ 
 const int WALL_WIDTH = 6;
@@ -67,7 +69,7 @@ const char* WALL_TEXT =
 char* wall_text;
 
 int loadActions(){
-    wall_text = (char*)malloc(strlen(WALL_TEXT)+1); 
+    wall_text = (char*)malloc((strlen(WALL_TEXT)+1) * sizeof(char)); 
     strcpy(wall_text, WALL_TEXT);
 
     //type /*/(0--'(()+
@@ -76,7 +78,7 @@ int loadActions(){
     int in_len = 9;
     //allocate string array
     for(j = 0; j<6; j++){
-        BASEMENT_WALL_TEXT[j] = (char*)malloc(strlen(BASEMENT_WALL_TEXT_ORIG[j]));
+        BASEMENT_WALL_TEXT[j] = (char*)malloc((strlen(BASEMENT_WALL_TEXT_ORIG[j]) + 1 ) * sizeof(char));
         strcpy(BASEMENT_WALL_TEXT[j], BASEMENT_WALL_TEXT_ORIG[j]); 
     }
 
@@ -103,22 +105,35 @@ int loadActions(){
     }
     //allocate string array
     for(j = 0; j<6; j++){
-        basement_wall_text[j] = (char*)malloc(strlen(BASEMENT_WALL_TEXT[j]));
+        basement_wall_text[j] = (char*)malloc((strlen(BASEMENT_WALL_TEXT[j]) + 1)*sizeof(char));
         strcpy(basement_wall_text[j], BASEMENT_WALL_TEXT[j]); 
     }
     
     return 0;
 }
 
-int respond(union ActionArg text){
-    printf("%s\n", text.text);
+int cleanupActions()
+{
+	free(wall_text);
+
+	int j = 0;
+    for(j = 0; j<6; j++){
+		free(BASEMENT_WALL_TEXT[j]);
+		free(basement_wall_text[j]);
+	}
+
+	return 0;
+}
+
+int respond(union ActionArg* text){
+    printf("%s\n", text->text);
     return 0;
 }
 
-int action_go(union ActionArg room_arg){
-    struct Room* arg_room = (struct Room*)room_arg.room;
+int action_go(union ActionArg* room_arg){
+    struct Room* arg_room = (struct Room*)room_arg->room;
     if(arg_room->on_enter != NULL){
-        if(!arg_room->on_enter()){
+        if(! (*(arg_room->on_enter))()){
             printf("You remain in the same room.\n");
             return 0;
         }
@@ -128,48 +143,48 @@ int action_go(union ActionArg room_arg){
     return 0;
 }
 
-int action_say(union ActionArg text){
-    printf("You say: %s\n", text.text);
+int action_say(union ActionArg* text){
+    printf("You say: %s\n", text->text);
     return 0;
 }
 
-int action_say_robot(union ActionArg text){
-    char* cmd = malloc(350); //TODO dangerous
-    char* input = malloc(350);
-    strcpy(input, text.text);
+int action_say_robot(union ActionArg* text){
+	char* cmd;
+    char input[350];
+    strcpy(input, text->text);
 
     //fuck loops
     cmd = strtok(input, " ");
     if(cmd != NULL){
         {
-            if(strcmp(cmd, VOICE_CMD) == 0){
-                cmd = strtok(NULL, " ");
+            if(nocase_strcmp(cmd, VOICE_CMD) == 0){
+    			cmd = strtok(NULL, " ");
                 if(cmd != NULL){
-                    if(strcmp(cmd, "HCF") == 0){
+                    if(nocase_strcmp(cmd, "HCF") == 0){
                         printf("Hahaha, do you think I am that stupid?\n");
-                    } else if(strcmp(cmd, "BREW") == 0){
+                    } else if(nocase_strcmp(cmd, "BREW") == 0){
                         printf("Sending BREW POST...\n");
                         printf("Received error response:...\n");
                         printf("Status 418: I'm a teapot\n");
                         printf("\"Sorry, I tried\"\n");
-                    } else if(strcmp(cmd, "COOK") == 0){
+                    } else if(nocase_strcmp(cmd, "COOK") == 0){
                         printf("\"The microwave is in the kitchen\" (behind the gate)\n");
-                    } else if(strcmp(cmd, "UNLOCK") == 0){
+                    } else if(nocase_strcmp(cmd, "UNLOCK") == 0){
                         if(gate_locked){
                             printf("The gate unlocks with a soft click...\n");
                             gate_locked = 0;
                         }
                         printf("You can now go through the gate! [gate]\n");
-                    } else if (strcmp(cmd, "open") == 0){
+                    } else if (nocase_strcmp(cmd, "open") == 0){
                         printf("I won't open the door :( \n");
                     } else {
                         printf("%s: command not found *Brrrrrt*\n", cmd);
 					}
 					
 					//check for roberflow
-					cmd = strtok(NULL, " ");
+    				cmd = strtok(NULL, " ");
 					if(cmd != NULL){
-						if(strcmp(cmd, "HCF") == 0){
+						if(nocase_strcmp(cmd, "HCF") == 0){
 							printf("The robot blows up and you die.\n");
 							return EXIT_WIN;
 						}else{
@@ -185,12 +200,10 @@ int action_say_robot(union ActionArg text){
                 printf("*quiet*\n");
             }
         }
-
-        free(input);
     }
     return 0;
 }
-int print_actions(union ActionArg text){
+int print_actions(union ActionArg* text){
     struct Action* action = room->actions;
     printf("You can do the following things: \n");
     while(action != NULL && action->query != NULL){
@@ -202,7 +215,7 @@ int print_actions(union ActionArg text){
     return 0;
 }
 
-int action_order_view(union ActionArg text){
+int action_order_view(union ActionArg* text){
     printf("The wall has these buttons (0 to 5) and text:\n");
     int i;
     int len = strlen(wall_text)+1;
@@ -215,15 +228,15 @@ int action_order_view(union ActionArg text){
 
 }
 
-int action_order_push(union ActionArg text){
-    if(!(strlen(text.text) == 1 && isdigit(text.text[0]))){
-        printf("There is no such button %s\n",text.text);
+int action_order_push(union ActionArg* text){
+    if(!(strlen(text->text) == 1 && isdigit(text->text[0]))){
+        printf("There is no such button %s\n",text->text);
         return 0;
     }
 
-    int button = atoi(text.text); //could fail if strange input? (input MUsT be in [1...9])
+    int button = atoi(text->text); //could fail if strange input? (input MUsT be in [1...9])
     if(button > 5 || button < 0){
-        printf("There is no such button %s\n",text.text);
+        printf("There is no such button %s\n",text->text);
         return 0;
     }
     printf("btn:%d\n",button);
@@ -240,7 +253,7 @@ int action_order_push(union ActionArg text){
     }
 
     //reuse ActionArg (lazy/bad?)
-    text.text = "The text on the wall has changed...";
+    text->text = "The text on the wall has changed...";
     respond(text);
     action_order_view(text);
     return 0;
@@ -260,8 +273,8 @@ int on_enter_microwave(){
 }
 
 
-int action_microwave(union ActionArg text){
-    int time = atoi(text.text);
+int action_microwave(union ActionArg* text){
+    int time = atoi(text->text);
     if(time != 0){
         printf("You microwave the hotdog %d seconds...\n", time);
         if(time == 71){
@@ -277,7 +290,7 @@ int action_microwave(union ActionArg text){
 }
 
 
-int action_close_trapdoor(union ActionArg text){
+int action_close_trapdoor(union ActionArg* text){
     if(follow_state == 0){
         trapdoor = !trapdoor;
         if(!trapdoor){
@@ -292,7 +305,7 @@ int action_close_trapdoor(union ActionArg text){
     return 0;
 }
 
-int action_listen(union ActionArg text){
+int action_listen(union ActionArg* text){
     if(!trapdoor){
         printf("*tap tap tap...*\nYou hear something, but you can not really determine what it is, or where it's coming from.\n");
         return 0;
@@ -309,7 +322,7 @@ int action_listen(union ActionArg text){
     return 0;
 }
 
-int action_follow_left(union ActionArg text){
+int action_follow_left(union ActionArg* text){
     if(trapdoor){
         if(follow_state == 0){
             printf("You walk about 10 meters through the darkness. The sound is louder than before [listen].\n");
@@ -329,7 +342,7 @@ int action_follow_left(union ActionArg text){
     return 0;
 }
 
-int action_follow_right(union ActionArg text){
+int action_follow_right(union ActionArg* text){
     if(trapdoor){
         if(follow_state == 0){
             printf("There seems to be a wall here. Let's go back and try to find a different route.\n");
@@ -347,14 +360,14 @@ int action_follow_right(union ActionArg text){
     }
     return 0;
 }
-int action_follow_return(union ActionArg text){
+int action_follow_return(union ActionArg* text){
     printf("You trace your path back to the where you came from...\n");
     printf("You are back at the start of the basement.\n");
     follow_state = 0;
     return 0;
 }
 
-int action_basement_check(union ActionArg text){
+int action_basement_check(union ActionArg* text){
     if(follow_state != 3){
         return 0;
     }
@@ -370,7 +383,7 @@ int action_basement_check(union ActionArg text){
     return 0;
 }
 
-int action_look_basement(union ActionArg text){
+int action_look_basement(union ActionArg* text){
     if(trapdoor){
         if(follow_state == 3){
             printf("All I can see is a little glowing button [push].\n");
@@ -382,7 +395,7 @@ int action_look_basement(union ActionArg text){
     return 0;
 }
 
-int action_basement_button(union ActionArg text){
+int action_basement_button(union ActionArg* text){
     if(follow_state == 3){
         printf("Upon pressing the light a spotlight shines on the wall on the other side of the room [examine]. Someone has written on it. It's hard to read, and the last part even seems to be encrypted. There also is a small keypad on the wall [type]. It expects 9 numbers to be entered.\n"); 
     }
@@ -409,19 +422,19 @@ int on_enter_robot(){
     return !trapdoor;
 }
 
-int action_basement_type(union ActionArg text){
+int action_basement_type(union ActionArg* text){
     if(follow_state != 3){
         return 0;
     }
 
-    int in_len = strlen(text.text);
+    int in_len = strlen(text->text);
 
     int row, col;
     for(row = 0; row < 6; row++){
         for(col = 0; col < 9*10; col++){  //dealing with unicode, just break on \0
             char orig_char = BASEMENT_WALL_TEXT[row][col]; 
             if(orig_char != '\0' && orig_char != '\n' && orig_char != '\t' && orig_char != ' '){
-                char input_at_index = text.text[col%in_len]; 
+                char input_at_index = text->text[col%in_len]; 
                 int offset = (int)input_at_index - (int)'0';
                 char new_char = (char)((int)orig_char + offset);
                 if(new_char != '\n' && new_char != '\t' && new_char != ' '){
@@ -439,7 +452,7 @@ int action_basement_type(union ActionArg text){
     }
 
     //reuse ActionArg (lazy/bad?)
-    text.text = "The text on the wall has changed...";
+    text->text = "The text on the wall has changed...";
     respond(text);
     action_basement_check(text);
     return 0;

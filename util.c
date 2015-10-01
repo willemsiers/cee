@@ -1,3 +1,7 @@
+#ifndef CEE_UTILS_C
+#define CEE_UTILS_C
+
+#include <ctype.h>
 /*
 *	Utility Functions
 */
@@ -78,3 +82,14 @@ void unescapeNewline(char* str){
 		}
 	}
 }
+
+int nocase_strcmp(char const *s1, char const *s2)
+{
+	for (;; s1++, s2++) {
+		int d = tolower(*s1) - tolower(*s2);
+		if (d != 0 || !*s1)
+			return d;
+	}
+}
+
+#endif
