@@ -12,28 +12,32 @@
 #define COL_DEFAULT 4 //enviromens dependent
 
 #ifdef _WIN32
+#define CLEAR_CONSOLE "cls"
+#include <windows.h>
+#include <wincon.h>
 void setTerminalColor(int colMode){
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
     CONSOLE_SCREEN_BUFFER_INFO consoleInfo;
-    WORD wAtributes;
+    WORD wAttributes;
     if(colMode == COL_INPUT){
-        wAttribute = FOREGROUND_GREEN;
+        wAttributes = FOREGROUND_GREEN;
     }
     else if(colMode == COL_STORY){
-        wAttribute = FOREGROUND_CYAN;
+        wAttributes = 0x0003; //CYAN
     }
     else if(colMode == COL_END){
-        wAttribute = FOREGROUND_YELLOW;
+        wAttributes =0x0006;//yellow
     }
     else if(colMode == COL_DEFAULT){
-        wAttribute = FOREGROUND_WHITE;
+        wAttributes = FOREGROUND_GREEN;//should be white or defualt, but couldn't find it in wincon.h
     }
 
     GetConsoleScreenBufferInfo(hConsole, &consoleInfo);
-    SetConsoleTextAttribute(hConsole, FOREGROUND_BLUE);
+    SetConsoleTextAttribute(hConsole, wAttributes);
 }
 
 #elif __unix
+#define CLEAR_CONSOLE "clear"
 void setTerminalColor(int colMode){
     if(colMode == COL_INPUT){
         printf("\x1B[32m");

@@ -380,6 +380,11 @@ int action_basement_check(union ActionArg* text){
             printf("\n");
         }
     }
+#ifdef _WIN32
+    setTerminalColor(COL_END);
+	printf("\n</game>\nSorry Adventurer, since this game was developed on Linux, and I am a lazy programmer not feeling like fixing it on Windows, this puzzle is broken. This puzzle can be skipped by typing \"boooWillem\".\n<game>\n");
+    setTerminalColor(COL_STORY);
+#endif
     return 0;
 }
 

@@ -12,3 +12,4 @@ return>action_follow_return>dummy
 push>action_basement_button>dummy>hidden
 type>action_basement_type>000000000>hidden
 examine>action_basement_check>dummy>hidden
+boooWillem>respond>@Manual@Page 7@HCF   @"Control of the computer could not be regained">hidden

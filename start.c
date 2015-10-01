@@ -18,8 +18,8 @@ int follow_state = 0;
 #define ROOM_FILE_ROOT ""
 #endif
 
-#define ROBO_NAME "House Robot 3000"
-#define VOICE_CMD "housebot"
+#define ROBO_NAME "House Robot 3000" //TODO: creativity
+#define VOICE_CMD "housebot" 
 #define BUF_SIZE 600
 #define BUF_SIZE_QUERY 32
 #define BUF_SIZE_HIDDEN 6
@@ -296,7 +296,8 @@ int main(){
 
         char enter_input = 0;
         while (enter_input  != '\r' && enter_input != '\n') { enter_input = getchar(); }
-        printf("\033[2J\033[1;1H"); //clear terminal
+        //printf("\033[2J\033[1;1H"); //clear terminal
+	system(CLEAR_CONSOLE);
 
         int exitStatus = start();
         if(exitStatus == EXIT_WIN){
