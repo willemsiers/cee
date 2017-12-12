@@ -14,9 +14,9 @@ for f in room*.txt; do
 done
 mv $path_out/data/room_listing.dat $path_out/data/rooms.dat
 
-echo -e "$(tput setaf 3)========START========="
+echo -e "========START========="
 echo "input: $filename_in -> output: $filename_out"
-echo -e "======================\n$(tput sgr0)"
+echo -e "======================\n$"
 if [ ! -d "bin" ]; then
     mkdir bin
     echo done
