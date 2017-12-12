@@ -1,7 +1,7 @@
 on_enter>on_enter_basement>dummy>hidden
 look>action_look_basement>dummy
 trapdoor>action_close_trapdoor>dummy
-climb>action_go>room1_robot.txt
+climb>action_go>room1_robot
 listen>action_listen>dummy>hidden
 hear>action_listen>dummy>hidden
 audio>action_listen>dummy>hidden

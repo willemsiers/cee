@@ -11,7 +11,7 @@ if [ ! -d "bin" ]; then
     mkdir bin
     echo done
 fi
-gcc $filename_in -o $filename_out -g -Wall -Wextra
+gcc $filename_in -o $filename_out -g -Wall -Wextra -Wno-unused-parameter
 
 #if [[ $? -eq 0 ]]; then
 #    ./$filename_out

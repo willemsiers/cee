@@ -3,7 +3,6 @@ In the end you find a note that contains something you must say to the robot to 
 Then you won the game
 Credits roll...
 
-
 Break out of the tomb of the robot mummy
 He/she/it has kidnapped you (the creator) and it has now gone into sleep mode
 The walls are aware...
@@ -19,7 +18,6 @@ examine>actions_switches_view>dummy
 set>actions_switch_set>dummy
 return>actions_go>room1_robot
 flee>actions_go_flee>dummy
-
 
 Encounter robot/machine
     >can talk to it [say]

@@ -1,4 +1,5 @@
 #ifndef ROOMDEF_C
+#include <string.h>
 #define ROOMDEF_C
 /*
  *	This file defines:
@@ -22,23 +23,24 @@ union ActionArg {
 	struct Room* room;
 };
 
-typedef int (* FuncSig)(union ActionArg defArg); //type for returning a void function with a string argument  
+typedef int (* FuncSig)(union ActionArg* defArg); //type for returning a void function with a string argument  
 
 //ACTION DEFINITION
 struct Action
 {	char* query;
-	int (*fupo)(union ActionArg);
-	union ActionArg defArg;
+	int (*fupo)(union ActionArg*);
+	union ActionArg* defArg;
 	int hidden;
 	struct Action* next;
 };
 
 struct Action* actions;
 
-
-void addAction(char* query, int (*fupo)(union ActionArg), union ActionArg defArg, int hidden){
+void addAction(char* query, int (*fupo)(union ActionArg*), union ActionArg* defArg, int hidden){
     struct Action* action = (struct Action*) malloc(sizeof(struct Action)); //new action
-    action->query = query;
+
+    action->query = (char*)malloc(sizeof(char) * (strlen(query) + 1));
+	strcpy(action->query, query);
     action->fupo = fupo;
     action->defArg = defArg;
     action->hidden = hidden;
@@ -51,22 +53,25 @@ void addAction(char* query, int (*fupo)(union ActionArg), union ActionArg defArg
     }else{
         //add to end of list`
         while(actionsTail ->next != NULL){
-            actionsTail  = actionsTail->next;
+            actionsTail = actionsTail->next;
         }
         actionsTail->next = action;
     }
-
 };
 
 struct Action* getAction(char* query){
 	struct Action* action = room->actions;
 	while(action != NULL){
 		if(strcmp(action->query, query) == 0){
-			return action;
+			break;
 		}
 		action = action->next;
 	}
-	return NULL;
+	if(action == NULL)
+	{
+		//printf("Action not found! %s\n",query);
+	}
+	return action;
 }
 
 void setOnEnter(int (*fupo)()){
